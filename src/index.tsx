@@ -3,10 +3,10 @@ import ReactDOM from "react-dom";
 import {IApiManager} from "./interface";
 import {injectable, inject, Container} from "inversify";
 import "reflect-metadata";
-import { TodoClient } from "./client";
+import TodoClient from "./client";
 
 @injectable()
-class ApiManager implements IApiManager
+export class ApiManager implements IApiManager
 {
     private readonly _client: TodoClient;
     _fetchedJSONString: string;
@@ -17,7 +17,7 @@ class ApiManager implements IApiManager
         this._client = client;
     }
 
-    fetchData() : string
+    public fetchData() : string
     {
         this._client.getData()
             .then(data => {
@@ -32,6 +32,8 @@ class ApiManager implements IApiManager
 var container = new Container();
 container.bind<TodoClient>(TodoClient).to(TodoClient);
 container.bind<ApiManager>(ApiManager).to(ApiManager);
+
+export {container};
 
 //React
 interface IProps
