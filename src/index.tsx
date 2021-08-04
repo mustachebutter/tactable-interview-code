@@ -1,17 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import {IApiManager} from "./interface";
-import {injectable, inject, Container} from "inversify";
+import {injectable, inject} from "inversify";
 import "reflect-metadata";
 import TodoClient from "./client";
+import { TYPES } from "./types";
 
 @injectable()
 export class ApiManager implements IApiManager
 {
     private readonly _client: TodoClient;
+    //Variable to store the retrieved JSON as a string
     _fetchedJSONString: string;
 
-    public constructor(@inject(TodoClient) client: TodoClient)
+    public constructor(@inject(TYPES.TodoClient) client: TodoClient)
     {
         this._fetchedJSONString = '';
         this._client = client;
@@ -19,23 +21,22 @@ export class ApiManager implements IApiManager
 
     public fetchData() : string
     {
+        //Use client method to make REST call
         this._client.getData()
             .then(data => {
                 this._fetchedJSONString = JSON.stringify(data);
-                console.log(this._fetchedJSONString);
+                //DEBUG only
+                //console.log(this._fetchedJSONString);
             });
-        return this._fetchedJSONString;
+
+        //Return a message for testing purposes.
+        return "success";
     }
 
 }
 
-var container = new Container();
-container.bind<TodoClient>(TodoClient).to(TodoClient);
-container.bind<ApiManager>(ApiManager).to(ApiManager);
-
-export {container};
-
-//React
+//React stuffs, only use to render out fetched data, but since it's asynchronous, nothing is rendered for now
+//Everything under this is not necessary.
 interface IProps
 {
 }

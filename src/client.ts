@@ -6,7 +6,7 @@ export default class TodoClient
 {
     async getData()
     {
-        const res = await fetch('https://jsonplaceholdertypicode.com/todos');
+        const res = await fetch('https://jsonplaceholder.typicode.com/todos');
         const data = await res.json();
         return data;
     }
