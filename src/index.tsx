@@ -11,7 +11,7 @@ class ApiManager implements IApiManager
     private readonly _client: TodoClient;
     _fetchedJSONString: string;
 
-    constructor(@inject(TodoClient) client: TodoClient)
+    public constructor(@inject(TodoClient) client: TodoClient)
     {
         this._fetchedJSONString = '';
         this._client = client;
@@ -20,8 +20,10 @@ class ApiManager implements IApiManager
     fetchData() : string
     {
         this._client.getData()
-            .then(data => this._fetchedJSONString = JSON.stringify(data));
-        console.log(this._fetchedJSONString);
+            .then(data => {
+                this._fetchedJSONString = JSON.stringify(data);
+                console.log(this._fetchedJSONString);
+            });
         return this._fetchedJSONString;
     }
 
@@ -56,7 +58,6 @@ class App extends React.Component<IProps, IState>
     componentDidMount()
     {
         this._fetchedData = this._apiManager.fetchData();
-        console.log(this._apiManager.fetchData());
     }
 
     render()
