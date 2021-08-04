@@ -1,66 +1,70 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import {IApiManager} from "./interface";
-import {injectable, inject} from "inversify";
+import {injectable, inject, Container} from "inversify";
 import "reflect-metadata";
+import { TodoClient } from "./client";
 
-
+@injectable()
 class ApiManager implements IApiManager
 {
-    constructor()
-    {
+    private readonly _client: TodoClient;
+    _fetchedJSONString: string;
 
+    constructor(@inject(TodoClient) client: TodoClient)
+    {
+        this._fetchedJSONString = '';
+        this._client = client;
     }
 
-    fetchData() {
-        
+    fetchData() : string
+    {
+        this._client.getData()
+            .then(data => this._fetchedJSONString = JSON.stringify(data));
+        console.log(this._fetchedJSONString);
+        return this._fetchedJSONString;
     }
 
 }
+
+var container = new Container();
+container.bind<TodoClient>(TodoClient).to(TodoClient);
+container.bind<ApiManager>(ApiManager).to(ApiManager);
 
 //React
 interface IProps
 {
-
 }
 
 interface IState
 {
-    fetchedJSONString : string,
 }
 
 class App extends React.Component<IProps, IState>
 {
+    _apiManager: ApiManager;
+    _todoClient: TodoClient;
+    _fetchedData: string;
     constructor(props: IProps)
     {
         super(props);
-        this.state = 
-        {
-            fetchedJSONString: ''
-        }
-    }
-
-    async fetchData()
-    {
-        const res = await fetch('https://jsonplaceholder.typicode.com/todos');
-        const data = await res.json();
-        return data;
+        this._todoClient = new TodoClient();
+        this._apiManager = new ApiManager(this._todoClient);
+        this._fetchedData = '';
     }
 
     componentDidMount()
     {
-        this.fetchData()
-        .then(data => {
-            this.setState({fetchedJSONString: JSON.stringify(data)});
-            console.log(data);
-        });
+        this._fetchedData = this._apiManager.fetchData();
+        console.log(this._apiManager.fetchData());
     }
 
     render()
     {
         return(
             <div>
-                {this.state.fetchedJSONString}
+                {this._fetchedData}
+                test
             </div>
         );
     }
